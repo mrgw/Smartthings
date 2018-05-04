@@ -4,6 +4,12 @@
 // If the MQTT Server ID in the html WiFiManager configuration screen is null then MQTT debug messages are not sent.
 // To use html debugging then html_debug in the following statement must be defined
 // If html_debug is commented out then html debugging is not available.
+//
+// 3-May-2018 update
+// 1. Set the connect timeout to 5 minutes (300 sec), so router has sufficient time to boot up to prevent 
+//      a connect timeout, which causes the device to get stuck in WiFiManager parameter reconfiguration.
+// 2. Added a softreset command, so it's possible to reset the device remotely without entering
+//      parameter reconfiguration mode. This is helpful for debugging. 
 
 #define html_debug 1
 //#define flip_display 1
@@ -559,6 +565,12 @@ void handleReset() {
   ESP.reset();
 }
 
+void handleSoftReset(){
+  debugger("executing Soft Reset");
+  delay(100);
+  ESP.reset();
+}
+
 
 //
 /************************************************** End **************************************************/
@@ -748,6 +760,11 @@ void setup_wifi() {
   WiFiManager wifiManager;
   wifiManager.setAPCallback(configModeCallback);
   // id/name, placeholder/prompt, default, length
+
+  // NEW. Setting the timeout parameter, added Nov 26, 2017
+  // set the timeout to a large value, so router has sufficient time to boot up to prevent a connect timeout causing WiFiManager parameter reconfiguration. 
+  wifiManager.setConnectTimeout(300); // 300 seconds = 5 minutes 
+
   WiFiManagerParameter config_mqtt_server("mqttserver", "mqtt server", mqtt_server, 40);
   wifiManager.addParameter(&config_mqtt_server);
   WiFiManagerParameter config_mqtt_port("mqttport", "mqtt port", mqtt_port, 10);
@@ -1278,6 +1295,7 @@ void setup()
   server.on("/xml", handleXML);
   server.on("/reset", handleReset);
 #endif
+  server.on("/softreset",handleSoftReset);
 
   server.on("/esp8266.xml", HTTP_GET, []() {
     SSDP.schema(server.client());
@@ -1377,4 +1395,3 @@ void loop() {
   displaystatemachine();
   processdisplaytimer();
 }
-
