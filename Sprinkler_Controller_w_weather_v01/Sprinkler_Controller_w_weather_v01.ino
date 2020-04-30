@@ -3,7 +3,7 @@
 // The MQTT Server ID must be set in the html WiFiManager configuration to send MQTT debug messages.
 // If the MQTT Server ID in the html WiFiManager configuration screen is null then MQTT debug messages are not sent.
 // To use html debugging then html_debug in the following statement must be defined
-// If html_debug is commented out then html debugging is not available.
+// If html_debug is commented out then html debugging is not available. changed today 4/29
 
 #define html_debug 1
 
